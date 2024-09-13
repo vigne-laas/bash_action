@@ -1,0 +1,25 @@
+actions:
+  action1:
+    ros_source_file: "/path/to/ros1_setup.bash"
+    pre_command: "echo 'Initialisation action 1'"
+    command: "roslaunch my_package my_launch_file_1.launch"
+  
+  action2:
+    ros_source_file: "/path/to/ros2_setup.bash"
+    pre_command: "echo 'Préparation de l'environnement action 2'"
+    command: "rosrun my_package my_node"
+  
+  topiclist:
+    ros_source_file: "/opt/ros/noetic/setup.bash"
+    pre_command: ""
+    command: "rostopic list"
+  
+  ls:
+    ros_source_file: ""
+    pre_command: ""
+    command: "ls"
+  
+  pwd:
+    ros_source_file: ""
+    pre_command: ""
+    command: "pwd"

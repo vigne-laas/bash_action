@@ -1,0 +1,9 @@
+<launch>
+  <!-- Paramètre pour spécifier le chemin vers le fichier YAML des actions -->
+  <arg name="yaml_file" default="$(find bash_action)/config/actions.yaml"/>
+
+  <!-- Démarrer le serveur d'action en passant le fichier YAML comme argument -->
+  <node name="bash_action_server" pkg="bash_action" type="bash_action_server.py" output="screen">
+    <param name="--yaml_path" value="$(arg yaml_file)" />
+  </node>
+</launch>

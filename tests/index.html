@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Action Server Client</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .feedback {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      height: 150px;
+      overflow-y: auto;
+      background-color: #f9f9f9;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+    button:disabled {
+      background-color: #6c757d;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Client du serveur d'action ROS</h1>
+
+  <button id="startAction" onclick="callAction()">Lancer l'action</button>
+
+  <div class="feedback" id="feedback">
+    <p><strong>Feedback :</strong></p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/roslib/build/roslib.min.js"></script>
+
+  <script>
+    let feedbackDiv = document.getElementById("feedback");
+    let startBtn = document.getElementById("startAction");
+
+    // Connexion à rosbridge via WebSocket
+    let ros = new ROSLIB.Ros({
+      url: 'ws://localhost:9090' // WebSocket de rosbridge (à ajuster selon votre config)
+    });
+
+    ros.on('connection', function() {
+      console.log('Connecté à ROS via WebSocket');
+    });
+
+    ros.on('error', function(error) {
+      console.log('Erreur de connexion à ROS :', error);
+    });
+
+    ros.on('close', function() {
+      console.log('Connexion à ROS fermée');
+    });
+
+    // Fonction pour appeler le serveur d'action
+    function callAction() {
+      startBtn.disabled = true;
+      feedbackDiv.innerHTML = "<p><strong>Feedback :</strong></p>";
+
+      // Création du client d'action
+      let actionClient = new ROSLIB.ActionClient({
+        ros: ros,
+        serverName: '/bash_action_server',
+        actionName: 'bash_action/BashAction'
+      });
+
+      // Création du goal
+      let goal = new ROSLIB.Goal({
+        actionClient: actionClient,
+        goalMessage: {
+          action_name: 'topiclist'  // Nom de l'action à exécuter
+        }
+      });
+
+      // Callback pour recevoir le feedback en temps réel
+      goal.on('feedback', function(feedback) {
+        feedbackDiv.innerHTML += `<p>${feedback.output}</p>`;
+        feedbackDiv.scrollTop = feedbackDiv.scrollHeight; // Scroll vers le bas
+      });
+
+      // Callback pour recevoir le résultat final
+      goal.on('result', function(result) {
+        startBtn.disabled = false; // Réactiver le bouton après la fin de l'action
+        feedbackDiv.innerHTML += `<p><strong>Résultat :</strong> ${result.result_message}</p>`;
+      });
+
+      // Envoyer le goal
+      goal.send();
+    }
+  </script>
+
+</body>
+</html>

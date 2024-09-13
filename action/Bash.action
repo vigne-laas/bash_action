@@ -1,0 +1,11 @@
+# Requête du client
+string action_name    # Nom de l'action à exécuter
+
+---
+# Réponse du serveur
+bool success          # Indique si l'action a été exécutée avec succès
+string result_message # Message final de succès ou d'erreur
+
+---
+# Feedback pendant l'exécution
+string output         # Sortie en temps réel du processus
